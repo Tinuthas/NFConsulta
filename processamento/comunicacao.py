@@ -64,6 +64,29 @@ class ComunicacaoSefaz(Comunicacao):
         print(etree.tostring(xml, pretty_print=False))
         return self._post(url, xml)
 
+    def consulta_recibo(self, modelo, numero):
+        """
+        Este método oferece a consulta do resultado do processamento de um lote de NF-e.
+        O aplicativo do Contribuinte deve ser construído de forma a aguardar um tempo mínimo de
+        15 segundos entre o envio do Lote de NF-e para processamento e a consulta do resultado
+        deste processamento, evitando a obtenção desnecessária do status de erro 105 - "Lote em
+        Processamento".
+        :param modelo: Modelo da nota
+        :param numero: Número da nota
+        :return:
+        """
+
+        # url do serviço
+        url = self._get_url(modelo=modelo, consulta='RECIBO')
+
+        # Monta XML do corpo da requisição
+        raiz = etree.Element('consReciNFe', versao=VERSAO_PADRAO, xmlns=NAMESPACE_NFE)
+        etree.SubElement(raiz, 'tpAmb').text = str(self._ambiente)
+        etree.SubElement(raiz, 'nRec').text = numero
+
+        # Monta XML para envio da requisição
+        xml = self._construir_xml_soap('NFeRetAutorizacao4', raiz)
+        return self._post(url, xml)
 
     def status_servico(self, modelo):
         """

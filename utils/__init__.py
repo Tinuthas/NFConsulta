@@ -1,8 +1,8 @@
 
 import os
 import codecs
+from unicodedata import normalize
 
-from cffi.backend_ctypes import unicode
 from pip._vendor.pyparsing import basestring
 
 try:
